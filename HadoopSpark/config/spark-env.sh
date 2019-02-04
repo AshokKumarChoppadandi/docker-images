@@ -1,0 +1,2 @@
+SPARK_MASTER_HOST=172.18.1.1
+JAVA_HOME=/usr/java/default
