@@ -1,0 +1,24 @@
+CREATE USER 'hive'@'*' IDENTIFIED BY 'hive';
+CREATE USER 'hive'@'localhost' IDENTIFIED BY 'hive';
+CREATE USER 'hive'@'127.0.0.1' IDENTIFIED BY 'hive';
+CREATE USER 'hive'@'nodemaster' IDENTIFIED BY 'hive';
+CREATE USER 'hive'@'node2' IDENTIFIED BY 'hive';
+CREATE USER 'hive'@'node3' IDENTIFIED BY 'hive';
+CREATE USER 'hive'@'node4' IDENTIFIED BY 'hive';
+CREATE USER 'hive'@'172.18.1.1' IDENTIFIED BY 'hive';
+CREATE USER 'hive'@'172.18.1.2' IDENTIFIED BY 'hive';
+CREATE USER 'hive'@'172.18.1.3' IDENTIFIED BY 'hive';
+CREATE USER 'hive'@'172.18.1.4' IDENTIFIED BY 'hive';
+GRANT all privileges on *.* to 'hive'@'*';
+GRANT all privileges on *.* to 'hive'@'localhost';
+GRANT all privileges on *.* to 'hive'@'127.0.0.1';
+GRANT all privileges on *.* to 'hive'@'nodemaster';
+GRANT all privileges on *.* to 'hive'@'node2';
+GRANT all privileges on *.* to 'hive'@'node3';
+GRANT all privileges on *.* to 'hive'@'node4';
+GRANT all privileges on *.* to 'hive'@'172.18.1.1';
+GRANT all privileges on *.* to 'hive'@'172.18.1.2';
+GRANT all privileges on *.* to 'hive'@'172.18.1.3';
+GRANT all privileges on *.* to 'hive'@'172.18.1.4';
+
+flush privileges;
