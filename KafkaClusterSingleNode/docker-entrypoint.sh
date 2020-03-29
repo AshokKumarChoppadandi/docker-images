@@ -31,6 +31,6 @@ echo "Starting Kafka Connect on $CONNECT_HOST:$CONNECT_PORT"
 connect-distributed.sh /usr/local/kafka_2.12-2.3.1/config/connect-distributed.properties &
 echo "Kafka Connect started...!!!"
 echo "sleeping for 5 seconds...!!!"
-sleep 5
+sleep 6
 
 exec "$@"

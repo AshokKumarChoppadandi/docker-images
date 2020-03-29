@@ -11,11 +11,17 @@ COPY ./lib/* /
 RUN yum update -y
 RUN yum install java-1.8.0-openjdk-devel unzip -y
 RUN tar -xzvf kafka_2.12-2.3.1.tgz -C /usr/local/
+
 COPY ./config/*.properties usr/local/kafka_2.12-2.3.1/config/
 COPY ./docker-entrypoint.sh /
+COPY ./docker-entrypoint-compose.sh /
+
+RUN chmod +x /docker-entrypoint.sh
+RUN chmod +x /docker-entrypoint-compose.sh
 RUN mkdir /usr/local/kafka_2.12-2.3.1/data
 RUN mkdir /usr/local/kafka_2.12-2.3.1/libs/connectors
 RUN unzip confluentinc-kafka-connect-jdbc-5.3.0.zip
+
 RUN mv confluentinc-kafka-connect-jdbc-5.3.0 /usr/local/kafka_2.12-2.3.1/libs/connectors/
 RUN mv mysql-connector-java-8.0.19.jar /usr/local/kafka_2.12-2.3.1/libs/
 RUN mv postgresql-42.2.11.jar /usr/local/kafka_2.12-2.3.1/libs/
@@ -37,9 +43,9 @@ ENV ZOOKEEPERS_LIST $ZOOKEEPER_HOST:$ZOOKEEPER_PORT
 
 ENV DEFAULT_CONNECT_PORT 8083
 ENV BROKERS_LIST $BROKER_HOST:$BROKER_PORT
-ENV CONNECT_HOST $KAFKA_HOST
+ENV CONNECT_HOST $BROKER_HOST
 ENV CONNECT_PORT $DEFAULT_CONNECT_PORT
-ENV CONNECT_REST_ADVERTISED_HOST $KAFKA_HOST
+ENV CONNECT_REST_ADVERTISED_HOST $BROKER_HOST
 ENV CONNECT_REST_ADVERTISED_PORT $DEFAULT_CONNECT_PORT
 
 ENTRYPOINT ["./docker-entrypoint.sh"]
