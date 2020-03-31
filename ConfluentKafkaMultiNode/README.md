@@ -27,9 +27,12 @@ $ docker-compose up -f docker-compose-build.yml -d
 
 ### Docker Compose command to stop the cluster:
 
-
 ```
 $ docker-compose down
+```
+
+```
+$ docker-compose -f docker-compose-build.yml down
 ```
 
 ## Kafka Connect - JDBC SOURCE & SINK CONNECTORS FOR POSTGRESQL DATABASE.
