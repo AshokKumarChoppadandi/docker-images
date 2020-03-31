@@ -1,0 +1,95 @@
+version: '3'
+
+networks:
+  confluent_kafka_cluster:
+    driver: bridge
+
+services:
+  zookeeper:
+    build:
+      context: ./ConfluentZookeeper/
+    #image: ashokkumarchoppadandi/confluent-kafka-zookeeper:0.0.1
+    networks:
+      - confluent_kafka_cluster
+    ports:
+      - "2181:2181"
+    hostname: zookeeper
+    environment:
+      HOSTNAME: zookeeper
+      ZOOKEEPER_HOST: zookeeper
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+  broker:
+    build:
+      context: ./ConfluentKafkaBroker/
+    #image: ashokkumarchoppadandi/confluent-kafka-broker:0.0.1
+    networks:
+      - confluent_kafka_cluster
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    hostname: broker
+    environment:
+      HOSTNAME: broker
+      BROKER_ID: 0
+      KAFKA_LISTENERS: PLAINTEXT:\/\/0.0.0.0:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT:\/\/broker:9092
+      DEFAULT_KAFKA_TOPIC_PARTITIONS: 3
+      ZOOKEEPERS_LIST: 'zookeeper:2181'
+      CONFLUENT_METADATA_SERVER_ADVERTISED_LISTENERS: http:\/\/broker:8090
+  connect:
+    build:
+      context: ./ConfluentConnect/
+    #image: ashokkumarchoppadandi/confluent-kafka-connect:0.0.1
+    networks:
+      - confluent_kafka_cluster
+    depends_on:
+      - zookeeper
+      - broker
+    ports:
+      - "8083:8083"
+    hostname: connect
+    environment:
+      HOSTNAME: connect
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT:\/\/broker:9092
+      KAFKA_CONNECT_CLUSTER_GROUP_ID: connect-cluster
+      KAFKA_CONNECT_KEY_CONVERTOR: io.confluent.connect.avro.AvroConverter
+      KAFKA_CONNECT_VALUE_CONVERTOR: io.confluent.connect.avro.AvroConverter
+      SCHEMA_REGISTRY_URL: http:\/\/schemaregistry:8081
+      KAFKA_CONNECT_INTERNAL_KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+      KAFKA_CONNECT_INTERNAL_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter 
+      CONNECT_HOST: connect
+      CONNECT_PORT: 8083
+  schemaregistry:
+    build:
+      context: ./ConfluentSchemaRegistry/
+    #image: ashokkumarchoppadandi/confluent-kafka-schema-registry:0.0.1
+    networks:
+      - confluent_kafka_cluster
+    depends_on:
+      - zookeeper
+      - broker
+    ports:
+      - "8081:8081"
+    hostname: schemaregistry
+    environment:
+      HOSTNAME: schemaregistry
+      ZOOKEEPERS_LIST: 'zookeeper:2181'
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT:\/\/broker:9092
+  postgres:
+    image: postgres:11
+    networks:
+      - confluent_kafka_cluster
+    depends_on:
+      - zookeeper
+      - broker
+      - connect
+    hostname: postgres
+    restart: always
+    environment:
+      POSTGRES_DB: testdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
