@@ -10,4 +10,3 @@ sed -i -e "s/ZOOKEEPER_TICK_TIME/$ZOOKEEPER_TICK_TIME/" /usr/local/confluent-5.3
 
 echo "Starting Zookeeper on $ZOOKEEPER_HOST:$ZOOKEEPER_PORT"
 zookeeper-server-start /usr/local/confluent-5.3.3/config/zookeeper.properties 
-

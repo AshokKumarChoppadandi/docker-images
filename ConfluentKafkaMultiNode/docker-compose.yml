@@ -6,7 +6,7 @@ networks:
 
 services:
   zookeeper:
-    image: ashokkumarchoppadandi/confluent-kafka-zookeeper:0.0.1
+    image: ashokkumarchoppadandi/confluent-kafka-zookeeper:0.1
     networks:
       - confluent_kafka_cluster
     ports:
@@ -18,7 +18,7 @@ services:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
   broker:
-    image: ashokkumarchoppadandi/confluent-kafka-broker:0.0.1
+    image: ashokkumarchoppadandi/confluent-kafka-broker:0.1
     networks:
       - confluent_kafka_cluster
     depends_on:
@@ -35,7 +35,7 @@ services:
       ZOOKEEPERS_LIST: 'zookeeper:2181'
       CONFLUENT_METADATA_SERVER_ADVERTISED_LISTENERS: http:\/\/broker:8090
   connect:
-    image: ashokkumarchoppadandi/confluent-kafka-connect:0.0.1
+    image: ashokkumarchoppadandi/confluent-kafka-connect:0.1
     networks:
       - confluent_kafka_cluster
     depends_on:
@@ -51,12 +51,16 @@ services:
       KAFKA_CONNECT_KEY_CONVERTOR: io.confluent.connect.avro.AvroConverter
       KAFKA_CONNECT_VALUE_CONVERTOR: io.confluent.connect.avro.AvroConverter
       SCHEMA_REGISTRY_URL: http:\/\/schemaregistry:8081
-      KAFKA_CONNECT_INTERNAL_KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
-      KAFKA_CONNECT_INTERNAL_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter 
+      CONNECT_CONFIGS_TOPIC: docker-connect-configs
+      CONNECT_OFFSETS_TOPIC: docker-connect-offsets
+      CONNECT_STATUSES_TOPIC: docker-connect-statuses
+      CONFIG_STORAGE_REPLICATION_FACTOR: 1
+      OFFSET_STORAGE_REPLICATION_FACTOR: 1
+      STATUS_STORAGE_REPLICATION_FACTOR: 1
       CONNECT_HOST: connect
       CONNECT_PORT: 8083
   schemaregistry:
-    image: ashokkumarchoppadandi/confluent-kafka-schema-registry:0.0.1
+    image: ashokkumarchoppadandi/confluent-schema-registry:0.1
     networks:
       - confluent_kafka_cluster
     depends_on:
@@ -85,3 +89,29 @@ services:
       POSTGRES_PASSWORD: postgres
     ports:
       - "5432:5432"
+  streamsapp:
+    image: ashokkumarchoppadandi/confluent-kafka-streams-app:0.1
+    networks:
+      - confluent_kafka_cluster
+    depends_on:
+      - zookeeper
+      - broker
+      - connect
+      - schemaregistry
+    hostname: streamsapp
+    environment:
+      HOSTNAME: streamsapp
+      ENVIRONMENT: dev
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT:\/\/broker:9092
+      STREAMS_APP_CONFIG_ID: add-schema-employee
+      INPUT_KAFKA_TOPIC: employee
+      INPUT_TOPIC_PARTITIONS: 3
+      INPUT_TOPIC_REPLICATION_FACTOR: 1
+      OUTPUT_KAFKA_TOPIC: employee-with-schema
+      OUTPUT_TOPIC_PARTITIONS: 3
+      OUTPUT_TOPIC_REPLICATION_FACTOR: 1
+      APP_JAR: EmployeeKafkaStreamsApp-1.0-SNAPSHOT.jar
+      APP_JAR_PATH: /IdeaProjects/EmployeeKafkaStreamsApp/target/
+      CLASS_NAME: com.bigdata.kafka.streams.AddSchemaToEmployeeJsonPayload
+    volumes:
+      - ~/IdeaProjects:/IdeaProjects:ro

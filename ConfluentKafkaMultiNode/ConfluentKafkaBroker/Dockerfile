@@ -1,4 +1,4 @@
-FROM ashokkumarchoppadandi/confluent-kafka-base:0.0.1
+FROM ashokkumarchoppadandi/confluent-kafka-base:0.1
 
 LABEL maintainer="Ashok Kumar Choppadandi <ashokkumar98778@gmail.com>"
 

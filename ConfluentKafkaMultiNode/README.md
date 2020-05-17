@@ -22,7 +22,25 @@ $ docker-compose up -d
 ```
 2. Building the Images in local and using them
 ```
-$ docker-compose up -f docker-compose-build.yml -d
+$ docker-compose up -f docker-compose-build.yml up -d
+```
+3. Building the Images in local and using them with env-file
+```
+$ docker-compose up -f docker-compose-env.yml --env-file env-file up -d
+```
+
+### Docker Compose command to check the status:
+
+```
+$ docker-compose ps
+```
+
+```
+$ docker-compose up -f docker-compose-build.yml ps
+```
+
+```
+$ docker-compose up -f docker-compose-env.yml --env-file env-file ps
 ```
 
 ### Docker Compose command to stop the cluster:
@@ -35,6 +53,9 @@ $ docker-compose down
 $ docker-compose -f docker-compose-build.yml down
 ```
 
+```
+$ docker-compose -f docker-compose-env.yml --env-file env-file down
+```
 ## Kafka Connect - JDBC SOURCE & SINK CONNECTORS FOR POSTGRESQL DATABASE.
 
 ### JDBC SOURCE CONNECTOR:

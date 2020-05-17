@@ -15,6 +15,7 @@ RUN mkdir /usr/local/confluent-5.3.3/data
 
 COPY ./config/*.properties /usr/local/confluent-5.3.3/config/
 
+RUN export JAVA_HOME=$(ls /usr/lib/jvm | grep "java-1.8.0-openjdk-1.8.0.*")
+
 ENV CONFLUENT_HOME /usr/local/confluent-5.3.3
-ENV JAVA_HOME /usr/lib/jvm/java-1.8.0-openjdk-1.8.0.242.b08-0.el7_7.x86_64
 ENV PATH $CONFLUENT_HOME/bin:$JAVA_HOME/bin:$PATH

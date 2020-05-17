@@ -1,4 +1,4 @@
-FROM ashokkumarchoppadandi/confluent-kafka-base:0.0.1
+FROM ashokkumarchoppadandi/confluent-kafka-base:0.1
 
 LABEL maintainer="Ashok Kumar Choppadandi <ashokkumar98778@gmail.com>"
 
@@ -17,10 +17,17 @@ ENV CONNECT_PORT 8083
 
 ENV KAFKA_ADVERTISED_LISTENERS $BROKER_HOST:$BROKER_PORT
 ENV KAFKA_CONNECT_CLUSTER_GROUP_ID: connect-cluster
-ENV KAFKA_CONNECT_KEY_CONVERTOR: io.confluent.connect.avro.AvroConverter
-ENV KAFKA_CONNECT_VALUE_CONVERTOR: io.confluent.connect.avro.AvroConverter
+ENV KAFKA_CONNECT_KEY_CONVERTOR: iorg.apache.kafka.connect.json.JsonConverter
+ENV KAFKA_CONNECT_VALUE_CONVERTOR: org.apache.kafka.connect.json.JsonConverter
 ENV SCHEMA_REGISTRY_URL: http:\/\/localhost:8081
-ENV KAFKA_CONNECT_INTERNAL_KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
-ENV KAFKA_CONNECT_INTERNAL_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+
+ENV CONNECT_CONFIGS_TOPIC connect_configs
+ENV CONNECT_OFFSETS_TOPIC connect_offsets
+ENV CONNECT_STATUSES_TOPIC connect_statuses
+
+ENV CONFIG_STORAGE_REPLICATION_FACTOR 1
+ENV OFFSET_STORAGE_REPLICATION_FACTOR 1
+ENV STATUS_STORAGE_REPLICATION_FACTOR 1
+
 
 ENTRYPOINT ["./confluent-connect-docker-entrypoint.sh"]
