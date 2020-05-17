@@ -1,7 +1,6 @@
 # docker-images
 
 ## Docker images for the DEV environments needed for a Developer.
----
 This repository consists of 5 different flavours of Hadoop Cluster.
 1. Hadoop Cluster
 2. Hadoop Cluster with Hive Installed
@@ -14,7 +13,6 @@ NOTE: HadoopBaseImage is used to build the Hadoop Cluster from a CentOS7 image.
 ## Steps to build the Docker images and Deploying the cluster
 
 ### Building the HadoopBaseImage
----
 
 Step 1: Clone the Repository:
 
@@ -48,7 +46,6 @@ docker build . -t ashokkumarchoppadandi/baseimage:latest
 ```
 
 ### Building Hadoop Cluster
----
 
 Step 1: Goto the **../docker-images/Hadoop** directory
 
@@ -149,7 +146,6 @@ $ ./hadoop_cluster.sh start
 ```
 
 ### Building Spark Standalone Spark Cluster
----
 
 Step 1: Goto **../docker-images/Spark** directory.
 
@@ -189,7 +185,6 @@ $ ./spark_standalone_cluster.sh start
 ```
 
 ### Building Hadoop and Spark Cluster with Hive installed
----
 
 Step 1: Goto **../docker-images/HadoopSpark** directory.
 
@@ -231,7 +226,6 @@ $ ./hadoop_spark_cluster.sh start
 ```
 
 ### Building Zeppelin Hadoop Spark Image on top of Hadoop and Spark Cluster
----
 
 Step 1: Goto **../docker-images/Zeppelin** directory.
 
@@ -281,7 +275,6 @@ The following is the shell scripts used to for creating the containers and runni
 5. zeppelin_hadoop_spark_cluster.sh - Hadoop and Spark Cluster with Hive and Zeppelin
 
 **zeppelin_hadoop_spark_cluster.sh**
----
 
 ```
 #!/bin/bash
