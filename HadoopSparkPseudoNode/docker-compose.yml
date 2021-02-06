@@ -1,0 +1,26 @@
+version: '3'
+
+# docker run -idt --hostname mycluster --name mycluster -p 50070:50070 \
+# -p 8032:8032 -p 8020:8020 -p 50030:50030 -p 19888:19888 -p 8088:8088 ashokkumarchoppadandi/hadoop:latest sh
+
+networks:
+  hadoop_cluster:
+    driver: bridge
+
+services:
+  hadoop:
+    image: ashokkumarchoppadandi/hadoopspark:latest
+    hostname: hadoopspark
+    networks:
+      - hadoop_cluster
+    ports:
+      - "50070:50070"
+      - "8032:8032"
+      - "8020:8020"
+      - "19888:19888"
+      - "8088:8088"
+      - "8080:8080"
+      - "4040:4040"
+    environment:
+      HOSTNAME: hadoopspark
+    command: "tail -f /home/hadoop/namenode-start.log"
