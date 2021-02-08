@@ -1,0 +1,1 @@
+docker run -idt -e HOSTNAME=broker -e ZOOKEEPERS_LIST="zookeeper:2181" -e KAFKA_ADVERTISED_LISTENERS="PLAINTEXT:\/\/broker:9092" -e KAFKA_LISTENERS="PLAINTEXT:\/\/broker:9092" --hostname broker --name broker --link zookeeper ashokkumarchoppadandi/confluent-kafka-broker:latest sh

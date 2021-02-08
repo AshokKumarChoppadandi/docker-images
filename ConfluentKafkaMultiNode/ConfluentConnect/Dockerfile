@@ -1,4 +1,4 @@
-FROM ashokkumarchoppadandi/confluent-kafka-base:0.1
+FROM ashokkumarchoppadandi/confluent-kafka-base:5.3.3
 
 LABEL maintainer="Ashok Kumar Choppadandi <ashokkumar98778@gmail.com>"
 
@@ -16,10 +16,10 @@ ENV CONNECT_HOST localhost
 ENV CONNECT_PORT 8083
 
 ENV KAFKA_ADVERTISED_LISTENERS $BROKER_HOST:$BROKER_PORT
-ENV KAFKA_CONNECT_CLUSTER_GROUP_ID: connect-cluster
-ENV KAFKA_CONNECT_KEY_CONVERTOR: iorg.apache.kafka.connect.json.JsonConverter
-ENV KAFKA_CONNECT_VALUE_CONVERTOR: org.apache.kafka.connect.json.JsonConverter
-ENV SCHEMA_REGISTRY_URL: http:\/\/localhost:8081
+ENV KAFKA_CONNECT_CLUSTER_GROUP_ID connect-cluster
+ENV KAFKA_CONNECT_KEY_CONVERTOR org.apache.kafka.connect.json.JsonConverter
+ENV KAFKA_CONNECT_VALUE_CONVERTOR org.apache.kafka.connect.json.JsonConverter
+ENV SCHEMA_REGISTRY_URL http:\/\/localhost:8081
 
 ENV CONNECT_CONFIGS_TOPIC connect_configs
 ENV CONNECT_OFFSETS_TOPIC connect_offsets

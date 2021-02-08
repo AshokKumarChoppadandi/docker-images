@@ -1,0 +1,1 @@
+docker run -idt -e HOSTNAME=schemaregistry -e KAFKA_ADVERTISED_LISTENERS=broker:9092 -e ZOOKEEPERS_LIST=zookeeper:2181 --name schemaregistry --hostname schemaregistry --link zookeeper --link broker --link connect -p 8081:8081 ashokkumarchoppadandi/confluent-schema-registry:latest sh

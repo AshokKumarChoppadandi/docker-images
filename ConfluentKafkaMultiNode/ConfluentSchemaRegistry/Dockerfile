@@ -1,4 +1,4 @@
-FROM ashokkumarchoppadandi/confluent-kafka-base:0.1
+FROM ashokkumarchoppadandi/confluent-kafka-base:5.3.3
 
 LABEL maintainer=AshokKumarChoppadandi<ashokkumar98778@gmail.com>
 
@@ -10,10 +10,8 @@ COPY ./schema-registry-docker-entrypoint.sh /
 RUN chmod +x /schema-registry-docker-entrypoint.sh
 
 ENV HOSTNAME localhost
-ENV ZOOKEEPER_PORT 2181
-ENV BROKER_PORT 9092
-ENV ZOOKEEPERS_LIST $HOSTNAME:$ZOOKEEPER_PORT
-ENV KAFKA_ADVERTISED_LISTENERS $HOSTNAME:$BROKER_PORT
+ENV ZOOKEEPERS_LIST localhost:2181
+ENV KAFKA_ADVERTISED_LISTENERS localhost:9092
 
 ENTRYPOINT ["./schema-registry-docker-entrypoint.sh"]
 
