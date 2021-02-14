@@ -6,7 +6,7 @@ networks:
 
 services:
   zookeeper:
-    image: ashokkumarchoppadandi/confluent-kafka-zookeeper:0.1
+    image: ashokkumarchoppadandi/confluent-kafka-zookeeper:latest
     networks:
       - confluent_kafka_cluster
     ports:
@@ -17,8 +17,9 @@ services:
       ZOOKEEPER_HOST: ${ZOOKEEPER_HOST}
       ZOOKEEPER_CLIENT_PORT: ${ZOOKEEPER_CLIENT_PORT}
       ZOOKEEPER_TICK_TIME: ${ZOOKEEPER_TICK_TIME}
+
   broker:
-    image: ashokkumarchoppadandi/confluent-kafka-broker:0.1
+    image: ashokkumarchoppadandi/confluent-kafka-broker:latest
     networks:
       - confluent_kafka_cluster
     depends_on:
@@ -29,34 +30,14 @@ services:
     environment:
       HOSTNAME: ${BROKER_HOST}
       BROKER_ID: ${BROKER_ID}
-      KAFKA_LISTENERS: ${KAFKA_LISTENERS}
-      KAFKA_ADVERTISED_LISTENERS: ${KAFKA_ADVERTISED_LISTENERS}
+      KAFKA_LISTENERS: PLAINTEXT:\/\/0.0.0.0:${BROKER_PORT}
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT:\/\/${BROKER_HOST}:${BROKER_PORT}
       DEFAULT_KAFKA_TOPIC_PARTITIONS: ${DEFAULT_KAFKA_TOPIC_PARTITIONS}
       ZOOKEEPERS_LIST: ${ZOOKEEPERS_LIST}
-      CONFLUENT_METADATA_SERVER_ADVERTISED_LISTENERS: http:\/\/broker:8090
-  connect:
-    image: ashokkumarchoppadandi/confluent-kafka-connect:0.1
-    networks:
-      - confluent_kafka_cluster
-    depends_on:
-      - ${ZOOKEEPER_HOST}
-      - ${BROKER_HOST}
-    ports:
-      - "8083:${CONNECT_PORT}"
-    hostname: ${CONNECT_HOST}
-    environment:
-      HOSTNAME: ${CONNECT_HOST}
-      KAFKA_ADVERTISED_LISTENERS: ${KAFKA_ADVERTISED_LISTENERS}
-      KAFKA_CONNECT_CLUSTER_GROUP_ID: ${KAFKA_CONNECT_CLUSTER_GROUP_ID}
-      KAFKA_CONNECT_KEY_CONVERTOR: ${KAFKA_CONNECT_KEY_CONVERTOR}
-      KAFKA_CONNECT_VALUE_CONVERTOR: ${KAFKA_CONNECT_VALUE_CONVERTOR}
-      SCHEMA_REGISTRY_URL: ${SCHEMA_REGISTRY_URL}
-      KAFKA_CONNECT_INTERNAL_KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
-      KAFKA_CONNECT_INTERNAL_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter 
-      CONNECT_HOST: ${CONNECT_HOST}
-      CONNECT_PORT: ${CONNECT_PORT}
+      CONFLUENT_METADATA_SERVER_ADVERTISED_LISTENERS: http:\/\/${BROKER_HOST}:8090
+
   schemaregistry:
-    image: ashokkumarchoppadandi/confluent-schema-registry:0.1
+    image: ashokkumarchoppadandi/confluent-schema-registry:latest
     networks:
       - confluent_kafka_cluster
     depends_on:
@@ -68,7 +49,63 @@ services:
     environment:
       HOSTNAME: ${SCHEMAREGISTRY_HOST}
       ZOOKEEPERS_LIST: ${ZOOKEEPERS_LIST}
-      KAFKA_ADVERTISED_LISTENERS: ${KAFKA_ADVERTISED_LISTENERS}
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT:\/\/${BROKER_HOST}:${BROKER_PORT}
+
+  connect:
+    image: ashokkumarchoppadandi/confluent-kafka-connect:latest
+    networks:
+      - confluent_kafka_cluster
+    depends_on:
+      - ${ZOOKEEPER_HOST}
+      - ${BROKER_HOST}
+      - ${SCHEMAREGISTRY_HOST}
+    ports:
+      - "8083:${CONNECT_PORT}"
+    hostname: ${CONNECT_HOST}
+    environment:
+      HOSTNAME: ${CONNECT_HOST}
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT:\/\/${BROKER_HOST}:${BROKER_PORT}
+      KAFKA_CONNECT_CLUSTER_GROUP_ID: ${KAFKA_CONNECT_CLUSTER_GROUP_ID}
+      KAFKA_CONNECT_KEY_CONVERTOR: ${KAFKA_CONNECT_KEY_CONVERTOR}
+      KAFKA_CONNECT_VALUE_CONVERTOR: ${KAFKA_CONNECT_VALUE_CONVERTOR}
+      SCHEMA_REGISTRY_URL: ${SCHEMA_REGISTRY_URL}
+      CONNECT_CONFIGS_TOPIC: ${CONNECT_CONFIGS_TOPIC}
+      CONNECT_OFFSETS_TOPIC: ${CONNECT_OFFSETS_TOPIC}
+      CONNECT_STATUSES_TOPIC: ${CONNECT_STATUSES_TOPIC}
+      CONFIG_STORAGE_REPLICATION_FACTOR: ${CONFIG_STORAGE_REPLICATION_FACTOR}
+      OFFSET_STORAGE_REPLICATION_FACTOR: ${OFFSET_STORAGE_REPLICATION_FACTOR}
+      STATUS_STORAGE_REPLICATION_FACTOR: ${STATUS_STORAGE_REPLICATION_FACTOR}
+      CONNECT_HOST: ${CONNECT_HOST}
+      CONNECT_PORT: ${CONNECT_PORT}
+
+  ksql:
+    image: ashokkumarchoppadandi/confluent-kafka-ksql:latest
+    networks:
+      - confluent_kafka_cluster
+    depends_on:
+      - ${ZOOKEEPER_HOST}
+      - ${BROKER_HOST}
+      - ${SCHEMAREGISTRY_HOST}
+    ports:
+      - "8088:${KSQL_PORT}"
+    hostname: ${KSQL_HOST}
+    environment:
+      HOSTNAME: ${KSQL_HOST}
+      BOOTSTRAP_SERVERS: ${BOOTSTRAP_SERVERS}
+      SCHEMAREGISTRY_URL: ${SCHEMAREGISTRY_URL}
+      KSQL_LOGGING_PROCESSING_TOPIC_AUTO_CREATE: ${KSQL_LOGGING_PROCESSING_TOPIC_AUTO_CREATE}
+      KSQL_LOGGING_PROCESSING_STREAM_AUTO_CREATE: ${KSQL_LOGGING_PROCESSING_STREAM_AUTO_CREATE}
+      KSQL_LOGGING_PROCESSING_ROWS_INCLUDE: ${KSQL_LOGGING_PROCESSING_ROWS_INCLUDE}
+      UI_ENABLED: ${UI_ENABLED}
+      KSQL_STREAMS_AUTO_OFFSET_RESET: ${KSQL_STREAMS_AUTO_OFFSET_RESET}
+      KSQL_STREAMS_COMMIT_INTERVAL_MS: ${KSQL_STREAMS_COMMIT_INTERVAL_MS}
+      MAX_BYTES_BUFFERING: ${MAX_BYTES_BUFFERING}
+      DESERIALIZATION_ERROR: ${DESERIALIZATION_ERROR}
+      KSQL_STREAMS_NUM_STREAM_THREADS: ${KSQL_STREAMS_NUM_STREAM_THREADS}
+      KSQL_SERVICE_ID: ${KSQL_SERVICE_ID}
+      KSQL_SINK_PARTITIONS: ${KSQL_SINK_PARTITIONS}
+      KSQL_SINK_REPLICAS: ${KSQL_SINK_REPLICAS}
+
   postgres:
     image: postgres:11
     networks:
@@ -85,29 +122,49 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
       - "5432:${POSTGRES_PORT}"
-  streamsapp:
-    image: ashokkumarchoppadandi/confluent-kafka-streams-app:0.1
+
+  mysql:
+    image: mysql:8
     networks:
       - confluent_kafka_cluster
     depends_on:
       - ${ZOOKEEPER_HOST}
       - ${BROKER_HOST}
       - ${CONNECT_HOST}
-      - ${SCHEMAREGISTRY_HOST}
-    hostname: ${STREAMSAPP_HOST}
+    hostname: ${MYSQL_HOST}
+    restart: always
     environment:
-      HOSTNAME: ${STREAMSAPP_HOST}
-      ENVIRONMENT: ${ENVIRONMENT}
-      KAFKA_ADVERTISED_LISTENERS: ${KAFKA_ADVERTISED_LISTENERS}
-      STREAMS_APP_CONFIG_ID: ${STREAMS_APP_CONFIG_ID}
-      INPUT_KAFKA_TOPIC: ${INPUT_KAFKA_TOPIC}
-      INPUT_TOPIC_PARTITIONS: ${INPUT_TOPIC_PARTITIONS}
-      INPUT_TOPIC_REPLICATION_FACTOR: ${INPUT_TOPIC_REPLICATION_FACTOR}
-      OUTPUT_KAFKA_TOPIC: ${OUTPUT_KAFKA_TOPIC}
-      OUTPUT_TOPIC_PARTITIONS: ${OUTPUT_TOPIC_PARTITIONS}
-      OUTPUT_TOPIC_REPLICATION_FACTOR: ${OUTPUT_TOPIC_REPLICATION_FACTOR}
-      APP_JAR: ${APP_JAR}
-      APP_JAR_PATH: ${APP_JAR_PATH}
-      CLASS_NAME: ${CLASS_NAME}
-    volumes:
-      - ${HOST_VOLUME_DIR}:${CONTAINER_DIR}:${VOLUME_PERMISSIONS}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - "3306:${MYSQL_PORT}"
+
+#  streamsapp:
+#    image: ashokkumarchoppadandi/confluent-kafka-streams-app:0.1
+#    networks:
+#      - confluent_kafka_cluster
+#    depends_on:
+#      - ${ZOOKEEPER_HOST}
+#      - ${BROKER_HOST}
+#      - ${CONNECT_HOST}
+#      - ${SCHEMAREGISTRY_HOST}
+#    hostname: ${STREAMSAPP_HOST}
+#    environment:
+#      HOSTNAME: ${STREAMSAPP_HOST}
+#      ENVIRONMENT: ${ENVIRONMENT}
+#      KAFKA_ADVERTISED_LISTENERS: ${KAFKA_ADVERTISED_LISTENERS}
+#      STREAMS_APP_CONFIG_ID: ${STREAMS_APP_CONFIG_ID}
+#      INPUT_KAFKA_TOPIC: ${INPUT_KAFKA_TOPIC}
+#      INPUT_TOPIC_PARTITIONS: ${INPUT_TOPIC_PARTITIONS}
+#      INPUT_TOPIC_REPLICATION_FACTOR: ${INPUT_TOPIC_REPLICATION_FACTOR}
+#      OUTPUT_KAFKA_TOPIC: ${OUTPUT_KAFKA_TOPIC}
+#      OUTPUT_TOPIC_PARTITIONS: ${OUTPUT_TOPIC_PARTITIONS}
+#      OUTPUT_TOPIC_REPLICATION_FACTOR: ${OUTPUT_TOPIC_REPLICATION_FACTOR}
+#      APP_JAR: ${APP_JAR}
+#      APP_JAR_PATH: ${APP_JAR_PATH}
+#      CLASS_NAME: ${CLASS_NAME}
+#    volumes:
+#      - ${HOST_VOLUME_DIR}:${CONTAINER_DIR}:${VOLUME_PERMISSIONS}
+#
