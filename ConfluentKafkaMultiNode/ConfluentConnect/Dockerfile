@@ -6,8 +6,13 @@ USER root
 
 WORKDIR /
 
+ENV DB_DRIVER "https://repo1.maven.org/maven2/mysql/mysql-connector-java/8.0.23/mysql-connector-java-8.0.23.jar"
+
 COPY ./confluent-connect-docker-entrypoint.sh /
-RUN chmod +x /confluent-connect-docker-entrypoint.sh
+RUN chmod +x /confluent-connect-docker-entrypoint.sh \
+    && yum install wget -y \
+    && wget $DB_DRIVER \
+    && mv *.jar $CONFLUENT_HOME/share/java/kafka-connect-jdbc/
 
 ENV BROKER_HOST localhost
 ENV BROKER_PORT 9092

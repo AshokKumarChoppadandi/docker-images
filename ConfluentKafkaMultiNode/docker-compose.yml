@@ -6,7 +6,7 @@ networks:
 
 services:
   zookeeper:
-    image: ashokkumarchoppadandi/confluent-kafka-zookeeper:0.1
+    image: ashokkumarchoppadandi/confluent-kafka-zookeeper:latest
     networks:
       - confluent_kafka_cluster
     ports:
@@ -17,8 +17,9 @@ services:
       ZOOKEEPER_HOST: zookeeper
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
+
   broker:
-    image: ashokkumarchoppadandi/confluent-kafka-broker:0.1
+    image: ashokkumarchoppadandi/confluent-kafka-broker:latest
     networks:
       - confluent_kafka_cluster
     depends_on:
@@ -31,16 +32,33 @@ services:
       BROKER_ID: 0
       KAFKA_LISTENERS: PLAINTEXT:\/\/0.0.0.0:9092
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT:\/\/broker:9092
-      DEFAULT_KAFKA_TOPIC_PARTITIONS: 3
+      DEFAULT_KAFKA_TOPIC_PARTITIONS: 1
       ZOOKEEPERS_LIST: 'zookeeper:2181'
       CONFLUENT_METADATA_SERVER_ADVERTISED_LISTENERS: http:\/\/broker:8090
-  connect:
-    image: ashokkumarchoppadandi/confluent-kafka-connect:0.1
+
+  schemaregistry:
+    image: ashokkumarchoppadandi/confluent-schema-registry:latest
     networks:
       - confluent_kafka_cluster
     depends_on:
       - zookeeper
       - broker
+    ports:
+      - "8081:8081"
+    hostname: schemaregistry
+    environment:
+      HOSTNAME: schemaregistry
+      ZOOKEEPERS_LIST: 'zookeeper:2181'
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT:\/\/broker:9092
+
+  connect:
+    image: ashokkumarchoppadandi/confluent-kafka-connect:latest
+    networks:
+      - confluent_kafka_cluster
+    depends_on:
+      - zookeeper
+      - broker
+      - schemaregistry
     ports:
       - "8083:8083"
     hostname: connect
@@ -59,20 +77,35 @@ services:
       STATUS_STORAGE_REPLICATION_FACTOR: 1
       CONNECT_HOST: connect
       CONNECT_PORT: 8083
-  schemaregistry:
-    image: ashokkumarchoppadandi/confluent-schema-registry:0.1
+
+  ksql:
+    image: ashokkumarchoppadandi/confluent-kafka-ksql:latest
     networks:
       - confluent_kafka_cluster
     depends_on:
       - zookeeper
       - broker
+      - schemaregistry
     ports:
-      - "8081:8081"
-    hostname: schemaregistry
+      - "8088:8088"
+    hostname: ksql
     environment:
-      HOSTNAME: schemaregistry
-      ZOOKEEPERS_LIST: 'zookeeper:2181'
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT:\/\/broker:9092
+      HOSTNAME: ksql
+      BOOTSTRAP_SERVERS: 'broker:9092'
+      SCHEMAREGISTRY_URL: 'http:\/\/schemaregistry:8081'
+      KSQL_LOGGING_PROCESSING_TOPIC_AUTO_CREATE: 'true'
+      KSQL_LOGGING_PROCESSING_STREAM_AUTO_CREATE: 'true'
+      KSQL_LOGGING_PROCESSING_ROWS_INCLUDE: 'true'
+      UI_ENABLED: 'true'
+      KSQL_STREAMS_AUTO_OFFSET_RESET: 'latest'
+      KSQL_STREAMS_COMMIT_INTERVAL_MS: 2000
+      MAX_BYTES_BUFFERING: 10000000
+      DESERIALIZATION_ERROR: 'false'
+      KSQL_STREAMS_NUM_STREAM_THREADS: 1
+      KSQL_SERVICE_ID: docker_
+      KSQL_SINK_PARTITIONS: 4
+      KSQL_SINK_REPLICAS: 1
+
   postgres:
     image: postgres:11
     networks:
@@ -84,34 +117,53 @@ services:
     hostname: postgres
     restart: always
     environment:
-      POSTGRES_DB: testdb
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: kafkadb
+      POSTGRES_USER: hadoop
+      POSTGRES_PASSWORD: Password@123
     ports:
       - "5432:5432"
-  streamsapp:
-    image: ashokkumarchoppadandi/confluent-kafka-streams-app:0.1
+
+  mysql:
+    image: mysql:8
     networks:
       - confluent_kafka_cluster
     depends_on:
       - zookeeper
       - broker
       - connect
-      - schemaregistry
-    hostname: streamsapp
+    hostname: mysql
+    restart: always
     environment:
-      HOSTNAME: streamsapp
-      ENVIRONMENT: dev
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT:\/\/broker:9092
-      STREAMS_APP_CONFIG_ID: add-schema-employee
-      INPUT_KAFKA_TOPIC: employee
-      INPUT_TOPIC_PARTITIONS: 3
-      INPUT_TOPIC_REPLICATION_FACTOR: 1
-      OUTPUT_KAFKA_TOPIC: employee-with-schema
-      OUTPUT_TOPIC_PARTITIONS: 3
-      OUTPUT_TOPIC_REPLICATION_FACTOR: 1
-      APP_JAR: EmployeeKafkaStreamsApp-1.0-SNAPSHOT.jar
-      APP_JAR_PATH: /IdeaProjects/EmployeeKafkaStreamsApp/target/
-      CLASS_NAME: com.bigdata.kafka.streams.AddSchemaToEmployeeJsonPayload
-    volumes:
-      - ~/IdeaProjects:/IdeaProjects:ro
+      MYSQL_ROOT_PASSWORD: Password@123
+      MYSQL_DATABASE: kafkadb
+      MYSQL_USER: hadoop
+      MYSQL_PASSWORD: Password@123
+    ports:
+      - "3306:3306"
+
+#  streamsapp:
+#    image: ashokkumarchoppadandi/confluent-kafka-streams-app:0.1
+#    networks:
+#      - confluent_kafka_cluster
+#    depends_on:
+#      - zookeeper
+#      - broker
+#      - connect
+#      - schemaregistry
+#    hostname: streamsapp
+#    environment:
+#      HOSTNAME: streamsapp
+#      ENVIRONMENT: dev
+#      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT:\/\/broker:9092
+#      STREAMS_APP_CONFIG_ID: add-schema-employee
+#      INPUT_KAFKA_TOPIC: employee
+#      INPUT_TOPIC_PARTITIONS: 3
+#      INPUT_TOPIC_REPLICATION_FACTOR: 1
+#      OUTPUT_KAFKA_TOPIC: employee-with-schema
+#      OUTPUT_TOPIC_PARTITIONS: 3
+#      OUTPUT_TOPIC_REPLICATION_FACTOR: 1
+#      APP_JAR: EmployeeKafkaStreamsApp-1.0-SNAPSHOT.jar
+#      APP_JAR_PATH: /IdeaProjects/EmployeeKafkaStreamsApp/target/
+#      CLASS_NAME: com.bigdata.kafka.streams.AddSchemaToEmployeeJsonPayload
+#    volumes:
+#      - ~/IdeaProjects:/IdeaProjects:ro

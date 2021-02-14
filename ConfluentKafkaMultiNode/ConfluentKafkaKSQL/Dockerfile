@@ -1,0 +1,29 @@
+FROM ashokkumarchoppadandi/confluent-kafka-base:5.3.3
+
+LABEL maintainer="Ashok Kumar Choppadandi <ashokkumar98778@gmail.com>"
+
+USER root
+
+WORKDIR /
+
+COPY ./confluent-ksql-docker-entrypoint.sh /
+RUN chmod +x /confluent-ksql-docker-entrypoint.sh
+
+
+ENV HOSTNAME localhost
+ENV KSQL_LOGGING_PROCESSING_TOPIC_AUTO_CREATE true
+ENV KSQL_LOGGING_PROCESSING_STREAM_AUTO_CREATE true
+ENV KSQL_LOGGING_PROCESSING_ROWS_INCLUDE true
+ENV BOOTSTRAP_SERVERS localhost:9092
+ENV SCHEMAREGISTRY_URL "http:\/\/localhost:8081"
+ENV UI_ENABLED true
+ENV KSQL_STREAMS_AUTO_OFFSET_RESET latest
+ENV KSQL_STREAMS_COMMIT_INTERVAL_MS 2000
+ENV MAX_BYTES_BUFFERING 10000000
+ENV DESERIALIZATION_ERROR false
+ENV KSQL_STREAMS_NUM_STREAM_THREADS 1
+ENV KSQL_SERVICE_ID docker_
+ENV KSQL_SINK_PARTITIONS 4
+ENV KSQL_SINK_REPLICAS 1
+
+ENTRYPOINT ["./confluent-ksql-docker-entrypoint.sh"]
