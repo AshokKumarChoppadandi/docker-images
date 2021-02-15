@@ -1,0 +1,17 @@
+{
+  "name": "PostgreSQLJdbcSinkConnector",
+  "config": {
+    "connector.class": "io.confluent.connect.jdbc.JdbcSinkConnector",
+    "topics": "connect-employee",
+    "tasks.max": "1",
+    "connection.url": "jdbc:postgresql://postgres:5432/kafkadb",
+    "connection.user": "hadoop",
+    "connection.password": "Password@123",
+    "auto.create": "true",
+    "auto.evolve": "true",
+    "dialect.name": "PostgreSqlDatabaseDialect",
+    "insert.mode": "insert",
+    "table.name.format": "associates",
+    "pk.mode": "kafka"
+  }
+}

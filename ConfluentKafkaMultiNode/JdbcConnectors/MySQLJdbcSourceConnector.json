@@ -1,0 +1,14 @@
+{
+  "name": "MySQLJdbcSourceConnector",
+  "config": {
+    "connector.class": "io.confluent.connect.jdbc.JdbcSourceConnector",
+    "tasks.max": "1",
+    "connection.url": "jdbc:mysql://mysql:3306/kafkadb",
+    "connection.user": "root",
+    "connection.password": "Password@123",
+    "topic.prefix": "connect-",
+    "mode": "incrementing",
+    "incrementing.column.name": "unique_id",
+    "tables.whitelist": "employee"
+  }
+}

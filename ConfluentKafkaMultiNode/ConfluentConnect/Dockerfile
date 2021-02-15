@@ -24,7 +24,7 @@ ENV KAFKA_ADVERTISED_LISTENERS $BROKER_HOST:$BROKER_PORT
 ENV KAFKA_CONNECT_CLUSTER_GROUP_ID connect-cluster
 ENV KAFKA_CONNECT_KEY_CONVERTOR org.apache.kafka.connect.json.JsonConverter
 ENV KAFKA_CONNECT_VALUE_CONVERTOR org.apache.kafka.connect.json.JsonConverter
-ENV SCHEMA_REGISTRY_URL http:\/\/localhost:8081
+ENV SCHEMA_REGISTRY_URL "http:\/\/localhost:8081"
 
 ENV CONNECT_CONFIGS_TOPIC connect_configs
 ENV CONNECT_OFFSETS_TOPIC connect_offsets
