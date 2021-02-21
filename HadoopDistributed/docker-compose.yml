@@ -1,0 +1,75 @@
+version: '3'
+
+networks:
+  hadoop_cluster:
+    driver: bridge
+
+services:
+  namenode:
+    image: ashokkumarchoppadandi/hadoop-namenode:latest
+    networks:
+      - hadoop_cluster
+    ports:
+      - "50070:50070"
+    hostname: namenode
+    environment:
+      HOSTNAME: namenode
+      NAMENODE_HOST: namenode
+      RESOURCE_MANAGER_HOST: resourcemanager
+
+  secondarynamenode:
+    image: ashokkumarchoppadandi/hadoop-secondarynamenode:latest
+    networks:
+      - hadoop_cluster
+    depends_on:
+      - namenode
+    hostname: secondarynamenode
+    environment:
+      HOSTNAME: secondarynamenode
+      NAMENODE_HOST: namenode
+      RESOURCE_MANAGER_HOST: resourcemanager
+
+  resourcemanager:
+    image: ashokkumarchoppadandi/hadoop-resourcemanager:latest
+    networks:
+      - hadoop_cluster
+    ports:
+      - "8088:8088"
+    hostname: resourcemanager
+    environment:
+      HOSTNAME: resourcemanager
+      RESOURCE_MANAGER_HOST: resourcemanager
+      NAMENODE_HOST: namenode
+
+  historyserver:
+    image: ashokkumarchoppadandi/hadoop-mr-historyserver:latest
+    networks:
+      - hadoop_cluster
+    ports:
+      - "19888:19888"
+    hostname: historyserver
+    environment:
+      HOSTNAME: historyserver
+      RESOURCE_MANAGER_HOST: resourcemanager
+      NAMENODE_HOST: namenode
+      MR_HISTORYSERVER_HOST: "0.0.0.0"
+
+  slave:
+    image: ashokkumarchoppadandi/hadoop-slavenode:latest
+    networks:
+      - hadoop_cluster
+    depends_on:
+      - namenode
+      - secondarynamenode
+      - resourcemanager
+      - historyserver
+    ports:
+      - "18042:8042"
+      - "15945:35945"
+    hostname: slave
+    environment:
+      HOSTNAME: slave
+      RESOURCE_MANAGER_HOST: resourcemanager
+      NAMENODE_HOST: namenode
+      SECONDARY_NAMENODE_HOST: secondarynamenode
+      MR_HISTORYSERVER_HOST: "http:\/\/historyserver"
