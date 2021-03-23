@@ -1,4 +1,4 @@
-FROM ashokkumarchoppadandi/confluent-kafka-base:5.3.3
+FROM ashokkumarchoppadandi/confluent-kafka-base:5.5.3
 
 LABEL maintainer=AshokKumarChoppadandi<ashokkumar98778@gmail.com>
 

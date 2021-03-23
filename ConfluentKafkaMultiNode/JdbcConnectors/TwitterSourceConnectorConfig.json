@@ -1,0 +1,17 @@
+{
+	"name": "TwitterSourceConnector",
+	"config": {
+	    "connector.class": "com.github.jcustenborder.kafka.connect.twitter.TwitterSourceConnector",
+	    "filter.keywords": "bigdata,kafka,streaming,hadoop",
+	    "kafka.status.topic": "twitter-tweets",
+	    "kafka.delete.topic": "twitter-tweets-deleted",
+	    "process.deletes": true,
+	    "twitter.oauth.accessToken": "REPLACE WITH ACCESS TOKEN",
+	    "twitter.oauth.accessTokenSecret": "REPLACE WITH ACCESS TOKEN SECRET",
+	    "twitter.oauth.consumerKey": "REPLACE WITH CONSUMER KEY",
+	    "twitter.oauth.consumerSecret": "REPLACE WITH CONSUMER SECRET",
+	    "queue.batch.size": 100,
+	    "queue.empty.ms": 100,
+	    "twitter.debug": true
+	}
+}

@@ -6,7 +6,7 @@ USER root
 
 WORKDIR /
 
-ENV CONFLUENT_DOWNLOAD_URL "https://packages.confluent.io/archive/5.3/confluent-5.3.3-2.12.tar.gz?_ga=2.121363336.101920513.1612884122-1865835482.1584121891"
+ENV CONFLUENT_DOWNLOAD_URL "https://packages.confluent.io/archive/5.5/confluent-community-5.5.3-2.12.tar.gz?_ga=2.122916171.130567946.1615625322-1865835482.1584121891"
 ENV CONFLUENT_HOME /usr/local/confluent
 
 # ADD ./lib/confluent-5.3.3-2.12.tar /usr/local/
