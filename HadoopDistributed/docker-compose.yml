@@ -73,3 +73,33 @@ services:
       NAMENODE_HOST: namenode
       SECONDARY_NAMENODE_HOST: secondarynamenode
       MR_HISTORYSERVER_HOST: "http:\/\/historyserver"
+
+  mysql:
+    image: ashokkumarchoppadandi/mysql:latest
+    networks:
+      - hadoop_cluster
+    hostname: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: Password@123
+      MYSQL_DATABASE: metastore
+
+  hive:
+    image: ashokkumarchoppadandi/hive:2.3.8
+    networks:
+      - hadoop_cluster
+    depends_on:
+      - mysql
+      - namenode
+      - resourcemanager
+      - secondarynamenode
+      - historyserver
+    ports:
+      - "10000:10000"
+      - "10001:10001"
+      - "10002:10002"
+    hostname: hive
+    environment:
+      METASTORE_HOST: mysql
+      NAMENODE_HOST: namenode
+      RESOURCE_MANAGER_HOST: resourcemanager
+      HISTORY_SERVER_HOST: historyserver
