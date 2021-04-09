@@ -11,7 +11,7 @@ ENV DB_DRIVER "https://repo1.maven.org/maven2/mysql/mysql-connector-java/8.0.23/
 COPY ./confluent-connect-docker-entrypoint.sh /
 COPY lib/jcustenborder-kafka-connect-twitter-0.3.33 $CONFLUENT_HOME/share/java/
 COPY lib/confluentinc-kafka-connect-elasticsearch-11.0.3 $CONFLUENT_HOME/share/java/
-
+COPY lib/confluentinc-kafka-connect-hdfs-10.0.2 $CONFLUENT_HOME/share/java/
 RUN chmod +x /confluent-connect-docker-entrypoint.sh \
     && yum install wget -y \
     && wget $DB_DRIVER \
