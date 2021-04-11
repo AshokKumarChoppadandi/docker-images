@@ -13,15 +13,22 @@ sed -i -e "s/HOSTNAME/$HISTORY_SERVER_HOST/" $MAPRED_PROEPRTIES_FILE
 HIVE_PROPERTIES_FILE=$HIVE_HOME/conf/hive-site.xml
 sed -i -e "s/METASTORE_HOST/$METASTORE_HOST/" $HIVE_PROPERTIES_FILE
 
+echo "Starting Datanode..."
+hadoop-daemon.sh start datanode
+
+sleep 2
+echo "Starting Node Manager..."
+yarn-daemon.sh start nodemanager
+
+sleep 2
+
 hdfs dfs -mkdir -p /user/hive/warehouse
 hdfs dfs -chmod g+w /user/hive/warehouse
 hdfs dfs -mkdir /tmp
 hdfs dfs -chmod g+w /tmp
 
-# shellcheck disable=SC2046
 echo "Sleeping started at" + $(date)
 sleep 120
-# shellcheck disable=SC2046
 echo "Sleeping completed at" + $(date)
 
 schematool -dbType mysql -initSchema --verbose

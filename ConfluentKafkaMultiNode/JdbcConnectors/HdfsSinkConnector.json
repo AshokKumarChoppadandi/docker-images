@@ -1,0 +1,10 @@
+{
+  "name": "hdfs-sink",
+  "config": {
+    "connector.class": "io.confluent.connect.hdfs.HdfsSinkConnector",
+    "tasks.max": "1",
+    "topics": "twitter-tweets",
+    "hdfs.url": "hdfs://namenode:9000/user/root/tweets/",
+    "flush.size": "100"
+  }
+}
