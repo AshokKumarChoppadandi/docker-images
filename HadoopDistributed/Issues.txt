@@ -1,0 +1,1 @@
+Add MySQL Connector jar to Spark Conf directory
